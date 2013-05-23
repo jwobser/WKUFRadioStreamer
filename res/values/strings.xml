@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">WKUF Radio Streamer</string>
+    <string name="action_settings">Settings</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="logo_description">This is the WKUF 94.3 FM-LP Logo</string>
+    <string name="mute_description">Mute Toggle Button</string>
+
+</resources>
