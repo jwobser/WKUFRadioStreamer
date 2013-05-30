@@ -2,11 +2,13 @@ package edu.kettering.wkufradio;
 
 import java.io.IOException;
 
+import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.app.Activity;
 import android.app.PendingIntent;
 import android.app.NotificationManager;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -26,6 +28,7 @@ import android.widget.Toast;
 // import android.widget.Toast;
 import android.widget.ToggleButton;
 import java.lang.Math;
+import edu.kettering.wkufradio.RemoteControlReceiver;
 
 
 public class Streamer extends Activity {
@@ -44,20 +47,25 @@ public class Streamer extends Activity {
 	private SeekBar seekVolume;
 	private ImageButton btnTogglePlay;
 	
-	/* ***** Media Player ***** */
-	public static MediaPlayer mp;
-	
+		
 	/* ***** Notification ***** */
 	private NotificationManager mNotificationManager;
 	
 	/* ***** Images ***** */
 	Bitmap large_notification_icon;
 	
+	/* ***** AudioManager ***** */
+	AudioManager myAudioManager = null;
+	
+	/* ***** Media Player ***** */
+	MediaPlayer mp = null;
 	
 	
 	
 	
-	public static void firstPlay(){
+	
+	/*
+	 public static void firstPlay(){
 		 mp = new MediaPlayer();
 		try	{
 		mp.setDataSource(StreamURL);
@@ -89,6 +97,7 @@ public class Streamer extends Activity {
 				}
 		
 	}
+	*/
 
 	
 	/* ***** Listeners ***** */
@@ -150,6 +159,12 @@ public class Streamer extends Activity {
 
 		@Override
 		public void onCheckedChanged(CompoundButton btn, boolean isChecked) {
+			
+			
+			// Should send signal to service
+			
+			
+			/*
 			if(isChecked == true){
 				isPlaying = true;
 				try	{
@@ -168,6 +183,7 @@ public class Streamer extends Activity {
 			else{
 				isPlaying = false;
 			}
+			*/
 
 /* Use to make sure that the mediaPlayer Exists before trying to operate on it?
 			if(boolIsPlaying == true){
@@ -181,6 +197,8 @@ public class Streamer extends Activity {
 			}
 			
 */			
+			
+			// If service returns playing state, toggle notification!!
 			NotifyPlaying();
 			
 		
@@ -194,11 +212,15 @@ public class Streamer extends Activity {
 		public void onProgressChanged(SeekBar seekBar, int progress,
 				boolean fromUser) {
 			
+			// Need to use AudioManager 
+			
+			/*
 			float calcvolume = (float)progress; // (float)(Math.log10((double)progress)/2);
 			fvolume = calcvolume/100;
 			mp.setVolume(fvolume, fvolume);
 			isMuted = false;
-					
+			*/
+			
 		}
 
 		@Override
@@ -230,11 +252,18 @@ public class Streamer extends Activity {
 		 btnTogglePlay = (ImageButton)findViewById(R.id.btnTogglePlay);
 		 btnTogglePlay.setOnClickListener(playClickListener);
 		
-		firstPlay();
-		Log.d("AppStatus","Starting Stream");
+		// firstPlay();
+		// Log.d("AppStatus","Starting Stream");
 				
-		NotifyPlaying();
+		// NotifyPlaying();
 		// streamerImplementation.StartPlaying();
+		 
+		 /* Create Audio Manager */
+		 AudioManager am = mContext.getSystemService(Context.AUDIO_SERVICE);
+		 // myAudioManager = (AudioManager) this.getSystemService(Context.AUDIO_SERVICE);
+		 // BroadcastReceiver myRemote =  new RemoteControlReceiver();
+		 myAudioManager.registerMediaButtonEventReceiver(RemoteControlReceiver);
+		 // myAudioManager.registerMediaButtonEventReceiver(new ComponentName(getPackageName(),RemoteControlReciver.getName()));
 		
 	}
 
