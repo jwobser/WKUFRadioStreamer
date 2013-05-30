@@ -1,14 +1,11 @@
 package edu.kettering.wkufradio;
 
-import java.io.IOException;
-
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.app.Activity;
 import android.app.PendingIntent;
 import android.app.NotificationManager;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -24,11 +21,7 @@ import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.ImageButton;
 import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
-import android.widget.Toast;
-// import android.widget.Toast;
 import android.widget.ToggleButton;
-import java.lang.Math;
-import edu.kettering.wkufradio.RemoteControlReceiver;
 
 
 public class Streamer extends Activity {
@@ -37,10 +30,7 @@ public class Streamer extends Activity {
 	private static boolean isPlaying; // Is media player playing?
 	private static boolean isMuted; // Is media player muted?
 	private static boolean isNotifying; //is Notification Active?
-	private float fvolume; //volume as a float 0-1
-	private int ivolume; //volume as an int 0-100.
-	private static final String StreamURL = "http://audio.moses.bz:80/wkuf-lp";
-	
+			
 	/* ***** View Items ***** */
 	private ToggleButton btnStreamToggle;
 	private ImageButton btnToggleMute;
@@ -60,44 +50,15 @@ public class Streamer extends Activity {
 	/* ***** Media Player ***** */
 	MediaPlayer mp = null;
 	
+	/* ***** Intents ***** */
+	Intent PausePlayIntent = null;
+	Intent StopIntent = null;
+	private static final String ACTION_PLAY = "edu.kettering.action.PLAY";
+	private static final String ACTION_STOP = "edu.kettering.action.STOP";
 	
 	
 	
 	
-	/*
-	 public static void firstPlay(){
-		 mp = new MediaPlayer();
-		try	{
-		mp.setDataSource(StreamURL);
-			} catch (IllegalArgumentException e){
-				e.printStackTrace();
-			} catch (SecurityException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (IllegalStateException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		Log.d("AppStatus", "Stream Source has been set to" + StreamURL);
-		
-		Log.d("AppStatus", "Async Prepare");
-		try	{
-			mp.prepareAsync();
-				} catch (IllegalArgumentException e){
-					e.printStackTrace();
-				} catch (SecurityException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (IllegalStateException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-		
-	}
-	*/
 
 	
 	/* ***** Listeners ***** */
@@ -106,7 +67,12 @@ public class Streamer extends Activity {
 	private OnClickListener playClickListener = new OnClickListener(){
 		@Override
 		public void onClick(View view){
-			if(isPlaying == true){
+			Log.d("AppStatus","Starting Service");
+			startService(PausePlayIntent);
+			
+			// Need to send PausePlay intent to Service!!
+			
+			/*if(isPlaying == true){
 				mp.pause();
 				btnTogglePlay.setImageResource(R.drawable.ic_play_btn);
 				isPlaying = false;
@@ -116,6 +82,7 @@ public class Streamer extends Activity {
 				btnTogglePlay.setImageResource(R.drawable.ic_pause_btn);
 				isPlaying = true;
 			}
+			*/
 		}
 	};
 	
@@ -123,33 +90,20 @@ public class Streamer extends Activity {
 	private OnClickListener muteClickListener = new OnClickListener(){
 		@Override
 		public void onClick(View view) {
-			if(isMuted == false){
+		
+		// Need to Send Mute to Audio Manager
+		
+			/*if(isMuted == false){
 			// Log.d("AppStatus","isMuted Returned false; Muting");
 			mp.setVolume(0, 0);
-			fvolume = seekVolume.getProgress()/100;
-			ivolume = seekVolume.getProgress();
 			seekVolume.setProgress(0);
 			isMuted = true;
-			
-			
-			/* ***** Toast for Testing ***** */
-			/*
-			Context context = getApplicationContext();
-			CharSequence text = String.valueOf(ivolume);
-			int duration = Toast.LENGTH_LONG;
-			Toast.makeText(context, text, duration).show();
-			*/
-			/* *****                    ***** */
-			
+								
 			
 			}else{
-				// Log.d("AppStatus","isMuted Returned True; Restoring Volume");
-				mp.setVolume(fvolume, fvolume);
-				// ivolume = (int)fvolume*100;
-				seekVolume.setProgress(ivolume);
 				isMuted = false;
 			}
-		NotifyPlaying();
+		NotifyPlaying();*/
 		}
 	};
 
@@ -164,39 +118,7 @@ public class Streamer extends Activity {
 			// Should send signal to service
 			
 			
-			/*
-			if(isChecked == true){
-				isPlaying = true;
-				try	{
-					mp.start();
-						} catch (IllegalArgumentException e){
-							e.printStackTrace();
-						} catch (SecurityException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						} catch (IllegalStateException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
-				
-				}
-			else{
-				isPlaying = false;
-			}
-			*/
-
-/* Use to make sure that the mediaPlayer Exists before trying to operate on it?
-			if(boolIsPlaying == true){
-				streamerImplementation.StartPlaying();
-				}
-			if(boolIsPlaying == true && boolIsPlaying != false){
-				//Do Something
-			}
-			else{
-				//Do Something
-			}
 			
-*/			
 			
 			// If service returns playing state, toggle notification!!
 			NotifyPlaying();
@@ -214,14 +136,7 @@ public class Streamer extends Activity {
 			
 			// Need to use AudioManager 
 			
-			/*
-			float calcvolume = (float)progress; // (float)(Math.log10((double)progress)/2);
-			fvolume = calcvolume/100;
-			mp.setVolume(fvolume, fvolume);
-			isMuted = false;
-			*/
-			
-		}
+			}
 
 		@Override
 		public void onStartTrackingTouch(SeekBar seekBar) {
@@ -252,6 +167,14 @@ public class Streamer extends Activity {
 		 btnTogglePlay = (ImageButton)findViewById(R.id.btnTogglePlay);
 		 btnTogglePlay.setOnClickListener(playClickListener);
 		
+		 PausePlayIntent = new Intent(this, edu.kettering.wkufService.WKUFStreamerService.class);
+		 StopIntent = new Intent(this, edu.kettering.wkufService.WKUFStreamerService.class);
+		 
+		 PausePlayIntent.setAction(ACTION_PLAY);
+		 StopIntent.setAction(ACTION_STOP);
+		 
+		 startService(PausePlayIntent);
+		 
 		// firstPlay();
 		// Log.d("AppStatus","Starting Stream");
 				
@@ -259,14 +182,13 @@ public class Streamer extends Activity {
 		// streamerImplementation.StartPlaying();
 		 
 		 /* Create Audio Manager */
-		 AudioManager am = mContext.getSystemService(Context.AUDIO_SERVICE);
 		 // myAudioManager = (AudioManager) this.getSystemService(Context.AUDIO_SERVICE);
 		 // BroadcastReceiver myRemote =  new RemoteControlReceiver();
-		 myAudioManager.registerMediaButtonEventReceiver(RemoteControlReceiver);
-		 // myAudioManager.registerMediaButtonEventReceiver(new ComponentName(getPackageName(),RemoteControlReciver.getName()));
+		 // myAudioManager.registerMediaButtonEventReceiver(myRemote);
 		
 	}
 
+	@Override
 	public void onNewIntent(Intent intent){
 		Log.d("AppStatus", "New Intent Recieved");
 		
@@ -281,7 +203,7 @@ public class Streamer extends Activity {
 
 
 	public void NotifyPlaying(){
-		Log.d("AppStatus", "Attempting to creat Notification");
+		Log.d("AppStatus", "Attempting to create Notification");
 		/* ***** Notification ***** */
 		mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 		large_notification_icon = BitmapFactory.decodeResource(getResources(), R.drawable.icon_large);
@@ -332,7 +254,9 @@ public class Streamer extends Activity {
 		
 	}
 	
+	
 }
+	
 		
 
 
